@@ -22,7 +22,7 @@ module Algorithms
 
         open_set.delete current
         closed_set.add current
-        neighbors(current).each do |neighbor|
+        self.neighbors(current, area).each do |neighbor|
           next if closed_set.include? neighbor
 
           possible_g_score = g_score[current] + 1 # this distance may be different and could be refactored to a method call
