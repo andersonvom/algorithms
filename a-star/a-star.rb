@@ -17,6 +17,11 @@ module Algorithms
       g_score[start] = 0
 
       while !open_set.empty?
+        current = open_set.min_by { |n| f_score[n] }
+        return if current == goal
+
+        open_set.delete current
+        closed_set.add current
       end
     end
     
