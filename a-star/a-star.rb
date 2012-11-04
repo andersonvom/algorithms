@@ -42,13 +42,10 @@ module Algorithms
     def self.neighbors(current, area)
       current_neighbors = []
       ((current.x-1)..(current.x+1)).each do |x|
-        next if x < 0
+        next if x < 0 or area[node.x].nil?
         ((current.y-1)..(current.y+1)).each do |y|
-          next if y < 0
-          node = OpenStruct.new
-          node.x = x
-          node.y = y
-          next unless area[node.x][node.y] # outside of area
+          next if y < 0 or area[node.x][node.y].nil?
+          node = OpenStruct.new(x: x, y: y)
           current_neighbors << node unless blocked?(node, area)
         end
       end
