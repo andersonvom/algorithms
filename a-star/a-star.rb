@@ -22,9 +22,31 @@ module Algorithms
 
         open_set.delete current
         closed_set.add current
+        neighbors(current).each do |neighbor|
+          next if closed_set.include? neighbor
+        end
       end
     end
     
+    def neighbors(current, area)
+      current_neighbors = []
+      ((current.x-1)..(current.x+1)).each do |x|
+        next if x < 0
+        ((current.y-1)..(current.y+1)).each do |y|
+          next if y < 0
+          node = OpenStruct.new
+          node.x = x
+          node.y = y
+          next unless area[node.x][node.y] # outside of area
+          current_neighbors << node unless blocked?(node, area)
+        end
+      end
+      current_neighbors
+    end
+
+    def blocked?(node, area)
+      area[node.x][node.y] =~ /[-_|]/
+    end
   end
 
 end
