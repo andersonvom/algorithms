@@ -38,6 +38,13 @@ module Algorithms
       return false
     end
     
+    # Straight line from `node` to `goal`
+    def self.simple_heuristic(node, goal)
+      x = node.x - goal.x
+      z = node.z - goal.z
+      Math.sqrt x**2 + z**2
+    end
+
     # Generates available neighbors in `area` for `current` node
     def self.neighbors(current, area)
       current_neighbors = []
