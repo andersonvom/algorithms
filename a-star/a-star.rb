@@ -2,11 +2,14 @@ module Algorithms
 
   module AStar
     require 'set'
+    Tuple ||= Struct.new(:x, :y)
   
     # Finds a path in `area` between `start` and `goal` using the `heuristic` function
     # `area` is a 2-dimentional array containing:
     #     [.]     for available paths
     #     [_-|]   for blocked paths
+    # `start` and `goal` are Tuple objects
+    # `heuristic` is a Proc object with a call to the heuristic function
     def self.solve(area, start, goal, heuristic)
       closed_set = Set.new        # visited nodes
       open_set = Set.new [start]  # possible nodes to visit
@@ -49,11 +52,11 @@ module Algorithms
     def self.neighbors(current, area)
       current_neighbors = []
       ((current.x-1)..(current.x+1)).each do |x|
-        next if x < 0 or area[node.x].nil?
+        next if x < 0 or area[x].nil?
         ((current.y-1)..(current.y+1)).each do |y|
-          next if y < 0 or area[node.x][node.y].nil?
-          node = OpenStruct.new(x: x, y: y)
-          current_neighbors << node unless blocked?(node, area)
+          next if y < 0 or area[x][y].nil?
+          node = Tuple.new(x, y)
+          current_neighbors << node unless self.blocked?(node, area)
         end
       end
       current_neighbors
