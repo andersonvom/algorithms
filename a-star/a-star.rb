@@ -21,7 +21,7 @@ module Algorithms
 
       while !open_set.empty?
         current = open_set.min_by { |n| f_score[n] }
-        return true if current == goal
+        return self.reconstruct_path(area, came_from, current) if current == goal
 
         open_set.delete current
         closed_set.add current
@@ -44,8 +44,16 @@ module Algorithms
     # Straight line from `node` to `goal`
     def self.simple_heuristic(node, goal)
       x = node.x - goal.x
-      z = node.z - goal.z
-      Math.sqrt x**2 + z**2
+      y = node.y - goal.y
+      Math.sqrt x**2 + y**2
+    end
+
+    # Reconstructs the path used to get to `node` using the information in `came_from`
+    # Path will be displayed in `area`
+    def self.reconstruct_path(area, came_from, node)
+      area[node.x][node.y] = '#' unless area[node.x][node.y] =~ /[SG]/
+      area = self.reconstruct_path(area, came_from, came_from[node]) if came_from[node]
+      area
     end
 
     # Generates available neighbors in `area` for `current` node
