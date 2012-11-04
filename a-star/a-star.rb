@@ -18,14 +18,24 @@ module Algorithms
 
       while !open_set.empty?
         current = open_set.min_by { |n| f_score[n] }
-        return if current == goal
+        return true if current == goal
 
         open_set.delete current
         closed_set.add current
         neighbors(current).each do |neighbor|
           next if closed_set.include? neighbor
+
+          possible_g_score = g_score[current] + 1 # this distance may be different and could be refactored to a method call
+          if possible_g_score <= g_score[neighbor]
+            came_from[neighbor] = current
+            g_score[neighbor] = possible_g_score
+            f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+            open_set.add neighbor
+          end
         end
       end
+
+      return false
     end
     
     # Generates available neighbors in `area` for `current` node
