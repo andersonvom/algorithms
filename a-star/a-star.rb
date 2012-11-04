@@ -28,6 +28,7 @@ module Algorithms
       end
     end
     
+    # Generates available neighbors in `area` for `current` node
     def neighbors(current, area)
       current_neighbors = []
       ((current.x-1)..(current.x+1)).each do |x|
@@ -44,6 +45,9 @@ module Algorithms
       current_neighbors
     end
 
+    # Determines whether `node` is blocked or available in `area`
+    # A node is blocked when it's one of the following symbols: -, _, |
+    # and free otherwise
     def blocked?(node, area)
       area[node.x][node.y] =~ /[-_|]/
     end
