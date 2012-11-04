@@ -7,7 +7,7 @@ module Algorithms
     # `area` is a 2-dimentional array containing:
     #     [.]     for available paths
     #     [_-|]   for blocked paths
-    def solve(area, start, goal, heuristic)
+    def self.solve(area, start, goal, heuristic)
       closed_set = Set.new        # visited nodes
       open_set = Set.new [start]  # possible nodes to visit
       came_from = {}              # used to reconstruct path from `goal` to `start`
@@ -39,7 +39,7 @@ module Algorithms
     end
     
     # Generates available neighbors in `area` for `current` node
-    def neighbors(current, area)
+    def self.neighbors(current, area)
       current_neighbors = []
       ((current.x-1)..(current.x+1)).each do |x|
         next if x < 0
@@ -58,7 +58,7 @@ module Algorithms
     # Determines whether `node` is blocked or available in `area`
     # A node is blocked when it's one of the following symbols: -, _, |
     # and free otherwise
-    def blocked?(node, area)
+    def self.blocked?(node, area)
       area[node.x][node.y] =~ /[-_|]/
     end
   end
