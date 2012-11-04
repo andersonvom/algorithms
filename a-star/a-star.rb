@@ -12,8 +12,8 @@ module Algorithms
       open_set = Set.new [start]  # possible nodes to visit
       came_from = {}              # used to reconstruct path from `goal` to `start`
 
-      f_score = Hash.new {0}      # Cost from `start` to `goal` using `heuristic`
-      g_score = Hash.new {0}      # Best cost coming from `start`
+      f_score = Hash.new {Float::INFINITY}  # Cost from `start` to `goal` using `heuristic`
+      g_score = Hash.new {Float::INFINITY}  # Best cost coming from `start`
       g_score[start] = 0
 
       while !open_set.empty?
