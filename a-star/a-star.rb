@@ -2,6 +2,7 @@ module Algorithms
 
   module AStar
     require 'set'
+    require 'curses'
     Tuple ||= Struct.new(:x, :y)
   
     # Finds a path in `area` between `start` and `goal` using the `heuristic` function
@@ -11,6 +12,10 @@ module Algorithms
     # `start` and `goal` are Tuple objects
     # `heuristic` is a Proc object with a call to the heuristic function
     def self.solve(area, start, goal, heuristic)
+      i = 0
+      Curses.init_screen
+      self.draw(area)
+      
       closed_set = Set.new        # visited nodes
       open_set = Set.new [start]  # possible nodes to visit
       came_from = {}              # used to reconstruct path from `goal` to `start`
@@ -21,7 +26,12 @@ module Algorithms
 
       while !open_set.empty?
         current = open_set.min_by { |n| f_score[n] }
-        return self.reconstruct_path(area, came_from, current) if current == goal
+        if current == goal
+          self.draw self.reconstruct_path(area.dup, came_from, current)
+          Curses.getch
+          Curses.close_screen
+          return
+        end
 
         open_set.delete current
         closed_set.add current
@@ -32,11 +42,17 @@ module Algorithms
           if possible_g_score <= g_score[neighbor]
             came_from[neighbor] = current
             g_score[neighbor] = possible_g_score
-            f_score[neighbor] = g_score[neighbor] + heuristic(neighbor, goal)
+            #f_score[neighbor] = g_score[neighbor] + heuristic.call(neighbor, goal)
+            f_score[neighbor] = g_score[neighbor] + self.simple_heuristic(neighbor, goal)
             open_set.add neighbor
           end
+          i += 1
+          self.preview(area, open_set, closed_set)
         end
       end
+
+      Curses.getch
+      Curses.close_screen
 
       return false
     end
@@ -54,6 +70,24 @@ module Algorithms
       area[node.x][node.y] = '#' unless area[node.x][node.y] =~ /[SG]/
       area = self.reconstruct_path(area, came_from, came_from[node]) if came_from[node]
       area
+    end
+
+    def self.draw(area)
+      #system "clear"
+      area.each_with_index do |row, x|
+        row.each_with_index do |col, y|
+          #print col
+          Curses.setpos(x, y); Curses.addstr(col)
+        end
+        #puts
+      end
+    end
+    
+    def self.preview(area, open_set, closed_set)
+      open_set.each { |e| Curses.setpos(e.x, e.y); Curses.addstr("o") unless area[e.x][e.y] =~ /[SG]/ }
+      closed_set.each { |e| Curses.setpos(e.x, e.y); Curses.addstr("x") unless area[e.x][e.y] =~ /[SG]/ }
+      Curses.refresh
+      sleep 0.005
     end
 
     # Generates available neighbors in `area` for `current` node
@@ -79,3 +113,22 @@ module Algorithms
   end
 
 end
+
+if $0 == __FILE__
+  start = Algorithms::AStar::Tuple.new(0, 0)
+  goal = Algorithms::AStar::Tuple.new(5, 2)
+  area = area = [[".", ".", "."],
+                 [".", ".", "."],
+                 [".", ".", "."],
+                 [".", "-", "-"],
+                 [".", ".", "."],
+                 [".", ".", "."]]
+  file = File.open "input.txt"
+  lines = file.lines.to_a
+  area = lines.map { |line| line.chomp.split('') }
+  area.each_with_index { |x, i| x.each_with_index { |y, j| start = Algorithms::AStar::Tuple.new(i, j) if y == "S" } }
+  area.each_with_index { |x, i| x.each_with_index { |y, j| goal  = Algorithms::AStar::Tuple.new(i, j) if y == "G" } }
+
+  Algorithms::AStar.solve area, start, goal, 0
+end
+
